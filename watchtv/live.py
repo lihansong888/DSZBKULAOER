@@ -1,22 +1,21 @@
 import requests
 import re
 import os
+
 # ========== 填写源的地址 ==========
 URL_LIST = [
     "https://iptv.445569.xyz/live.m3u",
 ]
-# ========== 要获取的分组：源分组名 -> 输出分组名 ==========
-BLOCK_GROUP = {
-    "🇨🇳央卫视直播[1]": "HS咪咕央卫直播",
-    "🇨🇳央卫视直播[2]": "HS咪咕央卫直播",
-    "💽纪录片直播": "HS纪录片直播",
-    "💖爱奇艺直播": "HS爱奇艺直播频道",
-    "🍔数字频道直播": "HS数字频道二线",
-    "🍿短剧直播": "HS短剧直播",
-    
 
-    
-}
+# 关键词映射：分组包含关键词 -> 输出分组名
+KEYWORD_GROUP = [
+    ("央卫视直播", "HS咪咕央卫直播"),
+    ("纪录片直播", "HS纪录片直播"),
+    ("爱奇艺直播", "HS爱奇艺直播频道"),
+    ("数字频道直播", "HS数字频道二线"),
+    ("短剧直播", "HS短剧直播"),
+]
+
 def parse_any(text: str):
     res = []
     extinf_line = None
@@ -45,15 +44,18 @@ def parse_any(text: str):
                 fake_ext = f'#EXTINF:-1,{name_part}'
             res.append((fake_ext, url_part))
     return res
+
 def get_channel_name(extinf):
     if "," in extinf:
         return extinf.split(",")[-1].strip()
     return ""
+
 def get_group_title(extinf):
     m = re.search(r'group-title="([^"]+)"', extinf)
     if m:
         return m.group(1).strip()
     return ""
+
 def main():
     channel_list = []      # [(输出分组名, 频道名, 地址)]
     seen = set()
@@ -61,15 +63,19 @@ def main():
         try:
             resp = requests.get(url, timeout=15)
             resp.raise_for_status()
-            channels = parse_any(resp.text)
+            text = resp.content.decode("utf-8")
+            channels = parse_any(text)
             for extinf, play_url in channels:
                 ch_name = get_channel_name(extinf)
                 ch_group = get_group_title(extinf)
-                # 只保留 BLOCK_GROUP 里有的分组，其余不要
-                if ch_group not in BLOCK_GROUP:
+                output_group = None
+                # 关键词模糊匹配
+                for kw, out_name in KEYWORD_GROUP:
+                    if kw in ch_group:
+                        output_group = out_name
+                        break
+                if output_group is None:
                     continue
-                # 输出时用映射后的分组名
-                output_group = BLOCK_GROUP[ch_group]
                 item_key = (ch_name, play_url)
                 if item_key not in seen:
                     seen.add(item_key)
@@ -89,6 +95,6 @@ def main():
     with open(m3u8_path, "w", encoding="utf-8") as f:
         f.write("\n".join(output_m3u))
     print(f"✅已输出 m3u8：{m3u8_path}")
+
 if __name__ == "__main__":
     main()
-
