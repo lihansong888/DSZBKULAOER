@@ -4,13 +4,11 @@ import os
 
 # ========== 填写源的地址 ==========
 URL_LIST = [
-    #"https://iptv.445569.xyz/live.m3u",
     "https://lihansong.top/iptv/src/live.m3u",
-    "https://lihansong.top/iptv/src/fytv.m3u",
-    
+    ("https://lihansong.top/iptv/src/fytv.m3u", "HS風雲港澳臺頻道"), # 第二个参数=强制分组
 ]
 
-# 关键词映射：分组包含关键词 -> 输出分组名
+# 关键词映射：分组包含关键词 -> 输出分组名（只给第一个源live.m3u用）
 KEYWORD_GROUP = [
     ("央卫视直播", "HS咪咕央卫直播"),
     ("纪录片直播", "HS纪录片直播"),
@@ -27,11 +25,8 @@ KEYWORD_GROUP = [
     ("钓鱼直播", "HS休闲频道"),
     ("热舞直播", "HS休闲频道"),
     ("女团直播", "HS休闲频道"),
-    ("HS風雲港澳臺頻道", "HS風雲港澳臺頻道"),
-    
-    
-    
 ]
+
 
 def parse_any(text: str):
     res = []
@@ -49,7 +44,7 @@ def parse_any(text: str):
             extinf_line = None
             continue
         if ',' in ln and not ln.startswith("#"):
-            sp = ln.split(',',1)
+            sp = ln.split(',', 1)
             name_part = sp[0].strip()
             url_part = sp[1].strip()
             if url_part == "#genre#":
@@ -62,10 +57,12 @@ def parse_any(text: str):
             res.append((fake_ext, url_part))
     return res
 
+
 def get_channel_name(extinf):
     if "," in extinf:
         return extinf.split(",")[-1].strip()
     return ""
+
 
 def get_group_title(extinf):
     m = re.search(r'group-title="([^"]+)"', extinf)
@@ -73,10 +70,18 @@ def get_group_title(extinf):
         return m.group(1).strip()
     return ""
 
+
 def main():
-    channel_list = []      # [(输出分组名, 频道名, 地址)]
+    channel_list = []
     seen = set()
-    for url in URL_LIST:
+    for item in URL_LIST:
+        # 判断是普通链接，还是带强制分组的元组
+        if isinstance(item, tuple):
+            url, force_group = item
+        else:
+            url = item
+            force_group = None
+
         try:
             resp = requests.get(url, timeout=15)
             resp.raise_for_status()
@@ -85,33 +90,41 @@ def main():
             for extinf, play_url in channels:
                 ch_name = get_channel_name(extinf)
                 ch_group = get_group_title(extinf)
-                output_group = None
-                # 关键词模糊匹配
-                for kw, out_name in KEYWORD_GROUP:
-                    if kw in ch_group:
-                        output_group = out_name
-                        break
-                if output_group is None:
-                    continue
+
+                if force_group is not None:
+                    # 强制分组逻辑（fytv走这里）
+                    output_group = force_group
+                else:
+                    # 原来的关键词匹配逻辑（live.m3u走这里）
+                    output_group = None
+                    for kw, out_name in KEYWORD_GROUP:
+                        if kw in ch_group:
+                            output_group = out_name
+                            break
+                    if output_group is None:
+                        continue
+
                 item_key = (ch_name, play_url)
                 if item_key not in seen:
                     seen.add(item_key)
                     channel_list.append((output_group, ch_name, play_url))
         except Exception as e:
             print(f"⚠️ 拉取 {url} 失败：{e}")
+
     total_cnt = len(channel_list)
     print(f"✅筛选结束，共提取 {total_cnt} 个频道")
     out_dir = os.path.dirname(os.path.abspath(__file__))
     output_m3u = ["#EXTM3U"]
-    # 按各自映射后的分组名输出
     for output_group, cname, curl in channel_list:
         fake_ext = f'#EXTINF:-1 group-title="{output_group}",{cname}'
         output_m3u.append(fake_ext)
         output_m3u.append(curl)
+
     m3u8_path = os.path.join(out_dir, "live.m3u8")
     with open(m3u8_path, "w", encoding="utf-8") as f:
         f.write("\n".join(output_m3u))
     print(f"✅已输出 m3u8：{m3u8_path}")
+
 
 if __name__ == "__main__":
     main()
