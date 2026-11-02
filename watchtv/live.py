@@ -6,6 +6,7 @@ import os
 URL_LIST = [
     #"https://iptv.445569.xyz/live.m3u",
     "https://lihansong.top/iptv/src/live.m3u",
+    "https://lihansong.top/iptv/src/fytv.m3u",
     
 ]
 
@@ -26,6 +27,7 @@ KEYWORD_GROUP = [
     ("钓鱼直播", "HS休闲频道"),
     ("热舞直播", "HS休闲频道"),
     ("女团直播", "HS休闲频道"),
+    ("HS風雲港澳臺頻道", "HS風雲港澳臺頻道"),
     
     
     
