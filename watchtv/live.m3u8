@@ -127,16 +127,28 @@ http://live.nctv.top/douyu1.php?id=9046097
 http://live.nctv.top/douyu1.php?id=9425669
 #EXTINF:-1 group-title="HS休闲频道",火宗君
 http://live.nctv.top/douyu1.php?id=9580477
+#EXTINF:-1 group-title="HS数字频道二线",求索记录
+http://121.199.48.54/live1/jsbv2b.m3u8?id=qsjl&usign=Gp4j6VjOiQ7iqQ83XxobXw
 #EXTINF:-1 group-title="HS数字频道二线",求索纪录
 http://192.187.124.34:81/live/qsjl.m3u8
 #EXTINF:-1 group-title="HS数字频道二线",求索动物
+http://121.199.48.54/live1/jsbv2b.m3u8?id=qskx&usign=Gp4j6VjOiQ7iqQ83XxobXw
+#EXTINF:-1 group-title="HS数字频道二线",求索动物
 http://192.187.124.34:81/live/qsdw.m3u8
-#EXTINF:-1 group-title="HS数字频道二线",求索海淘
-http://192.187.124.34:81/live/qskx.m3u8
+#EXTINF:-1 group-title="HS数字频道二线",求索科学
+http://121.199.48.54/live1/jsbv2b.m3u8?id=qskx&usign=Gp4j6VjOiQ7iqQ83XxobXw
+#EXTINF:-1 group-title="HS数字频道二线",求索生活
+http://121.199.48.54/live1/jsbv2b.m3u8?id=qssh&usign=Gp4j6VjOiQ7iqQ83XxobXw
 #EXTINF:-1 group-title="HS数字频道二线",求索生活
 http://192.187.124.34:81/live/qssh.m3u8
+#EXTINF:-1 group-title="HS数字频道二线",求索海淘
+http://192.187.124.34:81/live/qskx.m3u8
+#EXTINF:-1 group-title="HS数字频道二线",精彩影视
+http://121.199.48.54/live1/jsbv2b.m3u8?id=hsjcys&usign=Gp4j6VjOiQ7iqQ83XxobXw
 #EXTINF:-1 group-title="HS数字频道二线",精彩影视
 http://192.187.124.34:81/live/hsjcys.m3u8
+#EXTINF:-1 group-title="HS数字频道二线",风尚音乐
+http://121.199.48.54/live1/jsbv2b.m3u8?id=hsfsyy&usign=Gp4j6VjOiQ7iqQ83XxobXw
 #EXTINF:-1 group-title="HS数字频道二线",风尚音乐
 http://192.187.124.34:81/live/hsfsyy.m3u8
 #EXTINF:-1 group-title="HS数字频道二线",精品剧场
